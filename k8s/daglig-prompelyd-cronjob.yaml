@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daglig-prompelyd
+  namespace: drones
+  labels:
+    app: daglig-prompelyd
+    app.kubernetes.io/part-of: platform-drones
+spec:
+  schedule: "0 9 * * *"
+  timeZone: "Europe/Oslo"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: daglig-prompelyd
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: daglig-prompelyd
+              image: ghcr.io/sokratesai/platform-drones/daglig-prompelyd:latest
+              imagePullPolicy: Always
+              env:
+                - name: SLACK_BOT_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: slack-credentials
+                      key: bot-token
+                - name: SLACK_CHANNEL
+                  value: "C0AL8C82KN2"
+                - name: FREESOUND_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: fart-sound-credentials
+                      key: freesound-api-key
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi

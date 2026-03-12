@@ -9,6 +9,7 @@ Hardcoded automation drones for the SokratesAI platform. No LLM — pure schedul
 | `daily-digest` | 08:00 UTC daily | Posts top HN stories, Kubernetes blog, and CNCF blog links to Slack |
 | `cncf-watcher` | 09:00 UTC Monday | Diffs CNCF landscape for new/promoted projects, posts to Slack |
 | `github-activity` | 07:00 UTC daily | Reports merged PRs, open PRs, open issues, CI failures for the SokratesAI org |
+| `daglig-prompelyd` | 09:00 Oslo daily | Posts a random fart sound from Freesound.org to #daglige-prompelyder |
 
 ## Architecture
 
@@ -25,6 +26,15 @@ Hardcoded automation drones for the SokratesAI platform. No LLM — pure schedul
 
 ### `github-credentials` (K8s secret, namespace `drones`)
 - `token` — GitHub personal access token or fine-grained token with `repo` read access
+
+### `fart-sound-credentials` (K8s secret, namespace `drones`)
+- `freesound-api-key` — Freesound.org API key (free registration at https://freesound.org/apiv2/apply/)
+
+```bash
+kubectl create secret generic fart-sound-credentials \
+  --namespace drones \
+  --from-literal=freesound-api-key=YOUR_FREESOUND_API_KEY
+```
 
 ## Local development
 
