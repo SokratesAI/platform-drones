@@ -7,7 +7,7 @@ metadata:
     app: daglig-prompelyd
     app.kubernetes.io/part-of: platform-drones
 spec:
-  schedule: "0 9 * * *"
+  schedule: "30 7 * * *"
   timeZone: "Europe/Oslo"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
@@ -28,8 +28,8 @@ spec:
                 - name: SLACK_BOT_TOKEN
                   valueFrom:
                     secretKeyRef:
-                      name: slack-credentials
-                      key: bot-token
+                      name: slack-bot-creds
+                      key: SLACK_BOT_TOKEN
                 - name: SLACK_CHANNEL
                   value: "C0AL8C82KN2"
                 - name: FREESOUND_API_KEY
