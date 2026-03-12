@@ -26,6 +26,7 @@ jobs:
           - daily-digest
           - cncf-watcher
           - github-activity
+          - daglig-prompelyd
 
     steps:
       - name: Checkout
