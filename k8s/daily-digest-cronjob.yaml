@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-digest
+  namespace: drones
+  labels:
+    app: daily-digest
+    app.kubernetes.io/part-of: platform-drones
+spec:
+  schedule: "0 8 * * *"
+  timeZone: "UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: daily-digest
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: daily-digest
+              image: ghcr.io/sokratesai/platform-drones/daily-digest:latest
+              imagePullPolicy: Always
+              env:
+                - name: SLACK_BOT_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: slack-credentials
+                      key: bot-token
+                - name: SLACK_CHANNEL
+                  value: "#digest"
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi
