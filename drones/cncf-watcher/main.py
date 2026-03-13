@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 SLACK_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL", "#digest")
 SNAPSHOT_PATH = "/data/cncf-snapshot.json"
-LANDSCAPE_URL = "https://landscape.cncf.io/data/exports/landscape.json"
+LANDSCAPE_URL = "https://landscape.cncf.io/data/full.json"
 
 
 def fetch_landscape() -> dict[str, str]:
@@ -34,13 +34,11 @@ def fetch_landscape() -> dict[str, str]:
         return {}
 
     projects: dict[str, str] = {}
-    for category in data.get("landscape", []):
-        for subcategory in category.get("subcategories", []):
-            for item in subcategory.get("items", []):
-                name = item.get("name", "")
-                maturity = item.get("project", "")  # sandbox / incubating / graduated / ""
-                if name and maturity:
-                    projects[name] = maturity
+    for item in data.get("items", []):
+        name = item.get("name", "")
+        maturity = item.get("maturity", "")  # sandbox / incubating / graduated / ""
+        if name and maturity:
+            projects[name] = maturity
     log.info("Fetched %d CNCF projects", len(projects))
     return projects
 
@@ -79,7 +77,7 @@ def diff(old: dict[str, str], new: dict[str, str]) -> tuple[list[str], list[tupl
 
 def build_blocks(new_projects: list[str], promoted: list[tuple], total: int) -> list[dict]:
     blocks = [
-        {"type": "header", "text": {"type": "plain_text", "text": "CNCF Landscape Weekly Update", "emoji": True}},
+        {"type": "header", "text": {"type": "plain_text", "text": "CMCF'Landscape Weekly Update", "emoji": True}},
         {"type": "divider"},
     ]
 
@@ -115,7 +113,7 @@ def main():
     if snapshot is None:
         log.info("First run — posting baseline")
         blocks = [
-            {"type": "header", "text": {"type": "plain_text", "text": "CNCF Landscape — Baseline Captured", "emoji": True}},
+            {"type": "header", "text": {"type": "plain_text", "text": "CMCF'Landscape — Baseline Captured", "emoji": True}},
             {"type": "section", "text": {"type": "mrkdwn", "text": f"Tracking *{len(current)} projects*. Future runs will diff against this baseline."}},
             {"type": "context", "elements": [{"type": "mrkdwn", "text": "platform-drones/cncf-watcher"}]},
         ]
