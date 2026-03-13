@@ -17,9 +17,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger(__name__)
 
 SLACK_TOKEN = os.environ["SLACK_BOT_TOKEN"]
-SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL", "#digest")
+SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL", "#drone-cncf-watcher")
 SNAPSHOT_PATH = "/data/cncf-snapshot.json"
-LANDSCAPE_URL = "https://landscape.cncf.io/data/exports/landscape.json"
+LANDSCAPE_URL = "https://landscape.cncf.io/data/full.json"
 
 
 def fetch_landscape() -> dict[str, str]:
@@ -34,13 +34,11 @@ def fetch_landscape() -> dict[str, str]:
         return {}
 
     projects: dict[str, str] = {}
-    for category in data.get("landscape", []):
-        for subcategory in category.get("subcategories", []):
-            for item in subcategory.get("items", []):
-                name = item.get("name", "")
-                maturity = item.get("project", "")  # sandbox / incubating / graduated / ""
-                if name and maturity:
-                    projects[name] = maturity
+    for item in data.get("items", []):
+        name = item.get("name", "")
+        maturity = item.get("maturity", "")  # sandbox / incubating / graduated / ""
+        if name and maturity:
+            projects[name] = maturity
     log.info("Fetched %d CNCF projects", len(projects))
     return projects
 
